@@ -13,6 +13,7 @@ const int test_pin2 = 11;
 int timer1_counter;
 volatile int counter = 0;
 volatile long overflow_number = 10;
+volatile bool awaken = true;
 SoftwareSerial voice_control(5, 6);
 fan_control fan_control(fan_pin);
 dht11 environment_data;
@@ -55,7 +56,12 @@ void loop() {
   // delay(10);
   int received = 0;
   received = Serial.parseInt();
-  if (counter > overflow_number)
+  if (received == 100)
+  {
+    audio_player.play_response(voice_control);
+    awaken = true;
+  }
+  if (counter > overflow_number && awaken == false)
   {
     counter = 0;
     environment_data.read(sensor_pin);
@@ -82,56 +88,68 @@ void loop() {
       overflow_number = 1000;
     }
   }
-  switch (received)
+  if (awaken)
   {
-    case 1:
+    switch (received)
     {
-      fan_control.fan_switch(true);
-      break;
-    }
-    case 2:
-    {
-      fan_control.fan_switch(false);
-      break;
-    }
-    case 3:
-    {
-      fan_control.fan_mode(1);
-      break;
-    }
-    case 4:
-    {
-      fan_control.fan_mode(2);
-      break;
-    }
-    case 5:
-    {
-      fan_control.fan_mode(3);
-      break;
-    }
-    case 6:
-    {
-      fan_control.fan_change(true);
-      break;
-    }
-    case 7:
-    {
-      fan_control.fan_change(false);
-      break;
-    }
-    case 8:
-    {
-      environment_data.read(sensor_pin);
-      int temperature = environment_data.temperature;
-      audio_player.play_temperature(voice_control, temperature);
-      break;
-    }
-    case 9:
-    {
-      environment_data.read(sensor_pin);
-      int humidity = environment_data.humidity;
-      audio_player.play_humidity(voice_control, humidity);
-      break;
+      case 1:
+      {
+        fan_control.fan_switch(true);
+        awaken = false;
+        break;
+      }
+      case 2:
+      {
+        fan_control.fan_switch(false);
+        awaken = false;
+        break;
+      }
+      case 3:
+      {
+        fan_control.fan_mode(1);
+        awaken = false;
+        break;
+      }
+      case 4:
+      {
+        fan_control.fan_mode(2);
+        awaken = false;
+        break;
+      }
+      case 5:
+      {
+        fan_control.fan_mode(3);
+        awaken = false;
+        break;
+      }
+      case 6:
+      {
+        fan_control.fan_change(true);
+        awaken = false;
+        break;
+      }
+      case 7:
+      {
+        fan_control.fan_change(false);
+        awaken = false;
+        break;
+      }
+      case 8:
+      {
+        environment_data.read(sensor_pin);
+        int temperature = environment_data.temperature;
+        audio_player.play_temperature(voice_control, temperature);
+        awaken = false;
+        break;
+      }
+      case 9:
+      {
+        environment_data.read(sensor_pin);
+        int humidity = environment_data.humidity;
+        audio_player.play_humidity(voice_control, humidity);
+        awaken = false;
+        break;
+      }
     }
   }
 }

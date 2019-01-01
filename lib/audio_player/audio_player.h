@@ -14,6 +14,7 @@ private:
 public:
   audio_player(int rx_pin, int tx_pin);
   void play_welcome(SoftwareSerial voice_control);
+  void play_response(SoftwareSerial voice_control);
   void play_temperature(SoftwareSerial voice_control, int temperature);
   void play_humidity(SoftwareSerial voice_control, int humidity);
   void warning(SoftwareSerial voice_control);
