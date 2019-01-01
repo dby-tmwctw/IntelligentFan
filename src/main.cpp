@@ -3,11 +3,14 @@
 #include <fan_control.h>
 #include <dht11.h>
 #include <audio_player.h>
+#include <block_detector.h>
 
 const int fan_pin = 3;
 const int sensor_pin = 4;
 const int rx_pin = 5;
 const int tx_pin = 6;
+const int ultrasonic_trig_pin = 7;
+const int ultrasonic_echo_pin = 8;
 const int test_pin1 = 10;
 const int test_pin2 = 11;
 int timer1_counter;
@@ -18,6 +21,8 @@ SoftwareSerial voice_control(5, 6);
 fan_control fan_control(fan_pin);
 dht11 environment_data;
 audio_player audio_player(rx_pin, tx_pin);
+block_detector block_detector(ultrasonic_trig_pin, ultrasonic_echo_pin);
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -50,6 +55,29 @@ void setup() {
 //   }
 // }
 
+void block_sensor(int previous_value)
+{
+  bool blocked1 = block_detector.blocked();
+  delay(10);
+  bool blocked2 = block_detector.blocked();
+  if (blocked1 || blocked2)
+  {
+    audio_player.play_blocked_warning(voice_control);
+    fan_control.fan_switch(false);
+    while (true)
+    {
+      bool try_blocked = block_detector.blocked();
+      if (try_blocked == false)
+      {
+        fan_control.write_value = previous_value;
+        fan_control.run();
+        break;
+      }
+      delay(100);
+    }
+  }
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
   counter += 1;
@@ -64,6 +92,11 @@ void loop() {
   if (counter > overflow_number && awaken == false)
   {
     counter = 0;
+    if (fan_control.write_value != 255)
+    {
+      int previous_value = fan_control.write_value;
+      block_sensor(previous_value);
+    }
     environment_data.read(sensor_pin);
     int temperature = environment_data.temperature;
     if (temperature >= 30)
@@ -85,7 +118,7 @@ void loop() {
       {
         received = decision;
       }
-      overflow_number = 1000;
+      overflow_number = 500;
     }
   }
   if (awaken)

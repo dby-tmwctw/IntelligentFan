@@ -10,13 +10,13 @@ private:
   int low;
   int middle;
   int high;
-  void run();
 public:
   volatile int write_value;
   fan_control(int pin); // Initialiser
   void fan_switch(bool whether_on); // Switch on or off the fan
   void fan_mode(int mode); // Change fan to a certain mode
   void fan_change(bool increase); // Change fan speed
+  void run();
 };
 
 #endif

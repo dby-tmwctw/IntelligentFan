@@ -49,6 +49,11 @@ void audio_player::play_response(SoftwareSerial voice_control)
   audio_player::play_audio(voice_control, 16, true);
 }
 
+void audio_player::play_blocked_warning(SoftwareSerial voice_control)
+{
+  audio_player::play_audio(voice_control, 17, true);
+}
+
 void audio_player::play_temperature(SoftwareSerial voice_control, int temperature)
 {
   audio_player::play_audio(voice_control, 13, true);
