@@ -39,8 +39,10 @@ void setup() {
 
 void block_sensor(int previous_value)
 {
-  // This function checkes whether the fan is blocked. If so, stop the fan till
-  // the blockage is removed
+  /*
+  This function checkes whether the fan is blocked. If so, stop the fan till
+  the blockage is removed
+  */
   bool blocked1 = block_detector.blocked();
   delay(10);
   bool blocked2 = block_detector.blocked();

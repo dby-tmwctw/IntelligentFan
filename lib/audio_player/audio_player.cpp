@@ -11,8 +11,10 @@ audio_player::audio_player(int rx_pin, int tx_pin)
 
 void audio_player::play_audio(SoftwareSerial voice_control, byte audio_number, bool must_complete)
 {
-  // Play the song as specified by audio_number. If must_complete is true, the
-  // next song will play only after this audio is completed
+  /*
+  Play the song as specified by audio_number. If must_complete is true, the
+  next song will play only after this audio is completed
+  */
   byte play_command[] = {0x7E, 0x04, 0x03, 0x00, 0x00, 0xEF};
   play_command[4] = 0x00 + audio_number;
   voice_control.write(play_command, 6);
