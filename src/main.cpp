@@ -33,7 +33,7 @@ void setup() {
   pinMode(test_pin1, OUTPUT);
   pinMode(test_pin2, OUTPUT);
   analogWrite(fan_pin, 255);
-  audio_player.set_volume(voice_control, 10);
+  audio_player.set_volume(voice_control, 30);
   audio_player.play_welcome(voice_control);
   // noInterrupts();
   // TCCR1A = 0;
@@ -225,31 +225,37 @@ void loop() {
       case 13:
       {
         digitalWrite(test_pin1, HIGH);
+        awaken = false;
         break;
       }
       case 14:
       {
         digitalWrite(test_pin2, HIGH);
+        awaken = false;
         break;
       }
       case 15:
       {
         digitalWrite(test_pin1, LOW);
+        awaken = false;
         break;
       }
       case 16:
       {
         digitalWrite(test_pin2, LOW);
+        awaken = false;
         break;
       }
       case 17:
       {
         audio_player.play_song(voice_control);
+        awaken = false;
         break;
       }
       case 18:
       {
         audio_player.play_another(voice_control);
+        awaken = false;
         break;
       }
     }
