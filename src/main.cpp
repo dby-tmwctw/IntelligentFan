@@ -5,24 +5,23 @@
 #include <audio_player.h>
 #include <block_detector.h>
 
-const int fan_pin = 3;
-const int sensor_pin = 4;
-const int rx_pin = 5;
-const int tx_pin = 6;
-const int ultrasonic_trig_pin = 7;
-const int ultrasonic_echo_pin = 8;
-const int test_pin1 = 10;
-const int test_pin2 = 11;
-int timer1_counter;
-volatile int counter = 0;
-volatile long overflow_number = 10;
-volatile bool awaken = true;
-SoftwareSerial voice_control(5, 6);
-SoftwareSerial BT(9, 12);
-fan_control fan_control(fan_pin);
-dht11 environment_data;
-audio_player audio_player(rx_pin, tx_pin);
-block_detector block_detector(ultrasonic_trig_pin, ultrasonic_echo_pin);
+const int fan_pin = 3; // This pin connects to fan itself
+const int sensor_pin = 4; // This connects to temperature and humidity sensor
+const int rx_pin = 5; // This pin send information to JQ6500 voice controller
+const int tx_pin = 6; // This pin receives information from JQ6500 voice controller
+const int ultrasonic_trig_pin = 7; // This pin send trigger signal to ultrasonic sensor
+const int ultrasonic_echo_pin = 8; // This pin receives signal from ultrasonic sensor
+const int test_pin1 = 10; // This pin flashes green LED
+const int test_pin2 = 11; // This pin flashes yellow LED
+volatile int counter = 0; // This integer act as a counter
+volatile long overflow_number = 10; // When the previous integer becomes larger than this, read from temperature sensor
+volatile bool awaken = true; // Marker to mark whether the intelligent fan is in awaken mode
+SoftwareSerial voice_control(5, 6); // This communicates with JQ6500
+SoftwareSerial BT(9, 12); // This communicates with the bluetooth module
+fan_control fan_control(fan_pin); // This controls fan
+dht11 environment_data; // This contorls sensor
+audio_player audio_player(rx_pin, tx_pin); // This communicates with JQ6500
+block_detector block_detector(ultrasonic_trig_pin, ultrasonic_echo_pin); // This communicates with ultrasonic sensor
 
 
 void setup() {
@@ -33,32 +32,15 @@ void setup() {
   pinMode(test_pin1, OUTPUT);
   pinMode(test_pin2, OUTPUT);
   analogWrite(fan_pin, 255);
+  // When switched on, set default volume to 30 and play welcome audio
   audio_player.set_volume(voice_control, 30);
   audio_player.play_welcome(voice_control);
-  // noInterrupts();
-  // TCCR1A = 0;
-  // TCCR1B = 0;
-  // timer1_counter = 3036;
-  // TCNT1 = timer1_counter;
-  // TCCR1B |= (1 << CS10);
-  // TCCR1B |= (1 << CS12);
-  // TIMSK1 |= (1 << TOIE1);
-  // interrupts();
 }
-
-// ISR(TIMER1_OVF_vect)
-// {
-//   TCNT1 = timer1_counter;
-//   environment_data.read(sensor_pin);
-//   int temperature = environment_data.temperature;
-//   if (temperature >= 25)
-//   {
-//     audio_player.warning(voice_control);
-//   }
-// }
 
 void block_sensor(int previous_value)
 {
+  // This function checkes whether the fan is blocked. If so, stop the fan till
+  // the blockage is removed
   bool blocked1 = block_detector.blocked();
   delay(10);
   bool blocked2 = block_detector.blocked();
@@ -82,6 +64,10 @@ void block_sensor(int previous_value)
 
 void temperature_reaction()
 {
+  /*
+  This function plays warning and ask user to make decision whether to turn the
+  fan on when it is called
+  */
   audio_player.warning(voice_control);
   int decision = 0;
   while (true)
@@ -101,6 +87,10 @@ void temperature_reaction()
 
 byte read_bluetooth()
 {
+  /*
+  This function reads information from HC05 bluetooth module. The information
+  send to the module must be an integer between 0 and 99
+  */
   delay(10);
   BT.listen();
   volatile byte true_message = 0;
@@ -124,11 +114,12 @@ byte read_bluetooth()
 void loop() {
   // put your main code here, to run repeatedly:
   counter += 1;
-  // delay(10);
+  // Getting information from voice input
   int received = 0;
   received = Serial.parseInt();
   if (received == 0)
   {
+    // If nothing is received from voice input, try bluetooth
     received = read_bluetooth();
     if (received != 0)
     {
@@ -137,15 +128,18 @@ void loop() {
   }
   if (received == 50)
   {
+    // When its name is being asked, answer accodingly
     audio_player.play_name(voice_control);
   }
   if (received == 100)
   {
+    // This awakenes the intelligent fan
     audio_player.play_response(voice_control);
     awaken = true;
   }
   if (counter > overflow_number && awaken == false)
   {
+    // When counter overflows, check termperature and whether it is blocked
     counter = 0;
     if (fan_control.write_value != 255)
     {

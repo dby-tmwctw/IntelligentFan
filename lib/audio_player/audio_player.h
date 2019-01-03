@@ -1,3 +1,7 @@
+/*
+This class contains functions playing audios from JQ6500 module
+*/
+
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 

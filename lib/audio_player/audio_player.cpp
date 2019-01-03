@@ -24,6 +24,9 @@ void audio_player::play_audio(SoftwareSerial voice_control, byte audio_number, b
 
 void audio_player::play_number(SoftwareSerial voice_control, int number)
 {
+  /*
+  This function takes in an integer and plays it out
+  */
   if (number <= 10)
   {
     audio_player::play_audio(voice_control, number, true);
