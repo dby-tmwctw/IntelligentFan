@@ -162,48 +162,56 @@ void loop() {
     {
       case 1:
       {
+        // Turn on the fan. The default mode is middle
         fan_control.fan_switch(true);
         awaken = false;
         break;
       }
       case 2:
       {
+        // Turn off the fan
         fan_control.fan_switch(false);
         awaken = false;
         break;
       }
       case 3:
       {
+        // Change mode of fan to low
         fan_control.fan_mode(1);
         awaken = false;
         break;
       }
       case 4:
       {
+        // Change mode of fan to middle
         fan_control.fan_mode(2);
         awaken = false;
         break;
       }
       case 5:
       {
+        // Change mode of fan to high
         fan_control.fan_mode(3);
         awaken = false;
         break;
       }
       case 6:
       {
+        // Increase speed of the fan
         fan_control.fan_change(true);
         awaken = false;
         break;
       }
       case 7:
       {
+        // Decrease speed of the fan
         fan_control.fan_change(false);
         awaken = false;
         break;
       }
       case 8:
       {
+        // Read and play the temperature of the surrounding
         environment_data.read(sensor_pin);
         int temperature = environment_data.temperature;
         audio_player.play_temperature(voice_control, temperature);
@@ -212,6 +220,7 @@ void loop() {
       }
       case 9:
       {
+        // Read and play the humidity of the surrounding
         environment_data.read(sensor_pin);
         int humidity = environment_data.humidity;
         audio_player.play_humidity(voice_control, humidity);
@@ -220,36 +229,42 @@ void loop() {
       }
       case 13:
       {
+        // Turn on green LED
         digitalWrite(test_pin1, HIGH);
         awaken = false;
         break;
       }
       case 14:
       {
+        // Turn on yellow LED
         digitalWrite(test_pin2, HIGH);
         awaken = false;
         break;
       }
       case 15:
       {
+        // Turn off green LED
         digitalWrite(test_pin1, LOW);
         awaken = false;
         break;
       }
       case 16:
       {
+        // Turn off yellow LED
         digitalWrite(test_pin2, LOW);
         awaken = false;
         break;
       }
       case 17:
       {
+        // Play first song stored in JQ6500
         audio_player.play_song(voice_control);
         awaken = false;
         break;
       }
       case 18:
       {
+        // Change to another song stored in JQ6500
         audio_player.play_another(voice_control);
         awaken = false;
         break;
