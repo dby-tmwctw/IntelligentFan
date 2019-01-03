@@ -6,6 +6,7 @@ audio_player::audio_player(int rx_pin, int tx_pin)
 {
   RX_pin = rx_pin;
   TX_pin = tx_pin;
+  now_song = 0;
 }
 
 void audio_player::play_audio(SoftwareSerial voice_control, byte audio_number, bool must_complete)
@@ -54,6 +55,11 @@ void audio_player::play_blocked_warning(SoftwareSerial voice_control)
   audio_player::play_audio(voice_control, 17, true);
 }
 
+void audio_player::play_name(SoftwareSerial voice_control)
+{
+  audio_player::play_audio(voice_control, 18, true);
+}
+
 void audio_player::play_temperature(SoftwareSerial voice_control, int temperature)
 {
   audio_player::play_audio(voice_control, 13, true);
@@ -70,6 +76,23 @@ void audio_player::play_humidity(SoftwareSerial voice_control, int humidity)
 void audio_player::warning(SoftwareSerial voice_control)
 {
   audio_player::play_audio(voice_control, 14, true);
+}
+
+void audio_player::play_song(SoftwareSerial voice_control)
+{
+  audio_player::play_audio(voice_control, 19, false);
+}
+
+void audio_player::play_another(SoftwareSerial voice_control)
+{
+  if (now_song == 0)
+  {
+    now_song = 1;
+    audio_player::play_audio(voice_control, 20, false);
+  } else
+  {
+    audio_player::play_audio(voice_control, 19, false);
+  }
 }
 
 void audio_player::set_volume(SoftwareSerial voice_control, int volume)

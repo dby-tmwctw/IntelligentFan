@@ -33,7 +33,7 @@ void setup() {
   pinMode(test_pin1, OUTPUT);
   pinMode(test_pin2, OUTPUT);
   analogWrite(fan_pin, 255);
-  audio_player.set_volume(voice_control, 30);
+  audio_player.set_volume(voice_control, 10);
   audio_player.play_welcome(voice_control);
   // noInterrupts();
   // TCCR1A = 0;
@@ -101,8 +101,9 @@ void temperature_reaction()
 
 byte read_bluetooth()
 {
+  delay(10);
   BT.listen();
-  byte true_message = 0;
+  volatile byte true_message = 0;
   char first_char = BT.read();
   if (first_char != -1)
   {
@@ -133,6 +134,10 @@ void loop() {
     {
       awaken = true;
     }
+  }
+  if (received == 50)
+  {
+    audio_player.play_name(voice_control);
   }
   if (received == 100)
   {
@@ -215,6 +220,36 @@ void loop() {
         int humidity = environment_data.humidity;
         audio_player.play_humidity(voice_control, humidity);
         awaken = false;
+        break;
+      }
+      case 13:
+      {
+        digitalWrite(test_pin1, HIGH);
+        break;
+      }
+      case 14:
+      {
+        digitalWrite(test_pin2, HIGH);
+        break;
+      }
+      case 15:
+      {
+        digitalWrite(test_pin1, LOW);
+        break;
+      }
+      case 16:
+      {
+        digitalWrite(test_pin2, LOW);
+        break;
+      }
+      case 17:
+      {
+        audio_player.play_song(voice_control);
+        break;
+      }
+      case 18:
+      {
+        audio_player.play_another(voice_control);
         break;
       }
     }
